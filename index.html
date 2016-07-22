@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>hello</title>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+
+</head>
+<body ng-app="helloApp">
+<a href="#/">main</a>
+<a href="#/hello">hello</a>
+<br/>
+<ng-view></ng-view>
+</body>
+</html>
+
+<script type="text/javascript">
+    angular.module('helloApp', [
+        'ngRoute'
+    ]).config(function ($routeProvider) {
+
+        $routeProvider
+                .when('/', {
+                    templateUrl: 'views/main.html',
+                    controller: 'MainCtrl'
+                })
+                .when('/hello', {
+                    templateUrl: 'views/hello.html',
+                    controller: 'HelloCtrl'
+                })
+                .otherwise({
+                    redirectTo: '/'
+                });
+    });
+
+    angular.module('helloApp').controller('MainCtrl', function ($scope) {
+        $scope.todoList = [];
+        $scope.todo = 'coding';
+        $scope.add = function () {
+            $scope.todoList.push($scope.todo);
+            $scope.todo = '';
+        }
+    });
+
+    angular.module('helloApp')
+            .controller('HelloCtrl', function ($scope) {
+                $scope.hello = 'hello!! hello!!';
+            });
+</script>
