@@ -5,11 +5,13 @@
     <title>hello</title>
     <script src="bower_components/angular/angular.js"></script>
     <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-mocks/angular-mocks.js"></script>
 
 </head>
 <body ng-app="helloApp">
 <a href="#/">main</a>
 <a href="#/hello">hello</a>
+<a href="#/bbs">bbs</a>
 <br/>
 <ng-view></ng-view>
 </body>
@@ -17,8 +19,30 @@
 
 <script type="text/javascript">
     angular.module('helloApp', [
-        'ngRoute'
-    ]).config(function ($routeProvider) {
+        'ngRoute',
+        'ngMockE2E'
+    ]).run(function($httpBackend) {
+
+        $httpBackend.whenGET("api/bbs?page=1").respond(function(/*method, url, data*/){
+            return [200, [
+                {id: 1, title: 'hi1'},
+                {id: 2, title: 'hi2'},
+                {id: 3, title: 'hi3'},
+                {id: 4, title: 'hi4'}
+            ]];
+        });
+
+        $httpBackend.whenGET("api/bbs?page=2").respond(function(/*method, url, data*/){
+            return [200, [
+                {id: 5, title: 'hi5'},
+                {id: 6, title: 'hi6'},
+                {id: 7, title: 'hi7'},
+                {id: 8, title: 'hi8'}
+            ]];
+        });
+
+        $httpBackend.whenGET(/views\//).passThrough();
+    }).config(function ($routeProvider) {
 
         $routeProvider
                 .when('/', {
@@ -28,6 +52,10 @@
                 .when('/hello', {
                     templateUrl: 'views/hello.html',
                     controller: 'HelloCtrl'
+                })
+                .when('/bbs', {
+                    templateUrl: 'views/bbs.html',
+                    controller: 'BbsCtrl'
                 })
                 .otherwise({
                     redirectTo: '/'
@@ -41,10 +69,41 @@
             $scope.todoList.push($scope.todo);
             $scope.todo = '';
         }
-    });
 
-    angular.module('helloApp')
-            .controller('HelloCtrl', function ($scope) {
-                $scope.hello = 'hello!! hello!!';
+    }).controller('HelloCtrl', function ($scope) {
+        $scope.hello = 'hello!! hello!!';
+
+    }).controller('BbsCtrl', function ($scope, $http) {
+
+        $scope.newBbs = {};
+
+        $http.get('api/bbs?page=1').then(function(result) {
+            $scope.bbsList = result.data;
+        });
+
+        $scope.add = function(newBbs) {
+            // http
+            $scope.bbsList.push(newBbs);
+        };
+
+        $scope.mod = function(bbs) {
+            // http
+        };
+
+        $scope.del = function(bbs) {
+            // http
+            var idx = $scope.bbsList.indexOf(bbs);
+            if(idx !== -1) {
+                $scope.bbsList.splice(idx, 1);
+            }
+        };
+
+        $scope.page = function(p) {
+            $http.get('api/bbs?page=' + p).then(function(result) {
+                $scope.bbsList = result.data;
             });
+        }
+
+    })
+    ;
 </script>

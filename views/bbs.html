@@ -1,0 +1,20 @@
+<input type="text" ng-model="newBbs.id"/>
+<input type="text" ng-model="newBbs.title"/>
+<button ng-click="add(newBbs)">add</button>
+<br/>
+<ul ng-repeat="bbs in bbsList">
+    <li ng-init="mode = 'show'" ng-show="mode == 'show'">
+        {{bbs.title}}
+        <button ng-click="mode = 'mod'">수정</button>
+        <button ng-click="del(bbs)">삭제하기</button>
+    </li>
+    <li ng-show="mode == 'mod'">
+        <input type="text" ng-model="bbs.title"/>
+        <button ng-click="mod(bbs); mode='show'">수정하기</button>
+    </li>
+</ul>
+
+<h4>
+    <a ng-click="page(1)">1</a>
+    <a ng-click="page(2)">2</a>
+</h4>
