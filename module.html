@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>module</title>
+
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+    <link rel="stylesheet" href="bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-mocks/angular-mocks.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
+    <script src="bower_components/moment/moment.js"></script>
+    <script src="bower_components/moment/locale/ko.js"></script>
+    <script src="bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+</head>
+<body>
+
+<div ng-app="app" ng-controller="MainCtrl" class="container">
+    <div class="row">
+        <div>
+            {{text1}}, substring filter 적용 : {{text1 | substring}}
+            <input type="text" id="text1" ng-model="text1" focus-on />
+            <button ng-click="isoDatePrt()">to iso date string</button>
+            <br/>
+            {{text2}}
+            <input type="text" ng-model="text2" />
+            <button id="btn_click">to iso date string</button>
+        </div>
+        <div class='col-sm-6'>
+            <div class="form-group">
+                <div class='input-group date' date-time-picker dtp-config="dateConfig" >
+                    <input type='text' class="form-control" ng-model="date1" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class='input-group date' date-time-picker dtp-config="dateConfig2" >
+                    <input type='text' class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+<script>
+
+    angular.module('app', [])
+            .constant('config', {
+                dateConfig: {
+                    locale: 'ko'
+                },
+                dateConfig2: {
+                    locale: 'ko',
+                    format: 'LT'
+                }
+            })
+            .controller('MainCtrl', function ($scope, config, dateHelper) {
+
+                $scope.dateConfig = config.dateConfig;
+                $scope.dateConfig2 = config.dateConfig2;
+                $scope.text1 = new Date().toDateString();
+                $scope.text2 = new Date().toDateString();
+
+                $scope.isoDatePrt = function() {
+                    $scope.text1 = dateHelper.nowToISOString();
+                };
+
+                $('#btn_click').click(function() {
+                    $scope.text2 = new Date().toISOString();
+                    // angular 외의 이벤트 일 때는 apply 을 호출 하여야 한다
+                    $scope.$apply();
+                });
+
+            })
+            .directive('focusOn', function () {
+                return function (scope, elem, attr) {
+                    elem[0].focus();
+                };
+            })
+            .directive('dateTimePicker', function() {
+                return function (scope, elem, attr) {
+                    elem.datetimepicker(scope[attr.dtpConfig]);
+
+                    elem.on("dp.change", function (e) {
+                        scope.$apply();
+                    });
+                };
+            })
+            .service('dateHelper', function() {
+                return {
+                    nowToISOString: function() {
+                        return new Date().toISOString();
+                    }
+                }
+            })
+            .filter('substring', function () {
+                return function(d, len) {
+                    len = len | 4;
+                    return d.toString().substring(0, len);
+                }
+            })
+    ;
+</script>
+
+</html>
